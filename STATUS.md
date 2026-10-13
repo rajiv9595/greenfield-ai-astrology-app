@@ -10,6 +10,8 @@ Phase 1 foundation is complete. Phase 2 decision work is complete: ADR-003 locks
 
 Initial foundation commit: `0425268c6c22d36690386317287cb9dd0f5dd4f7` (this status update will be amended into that commit).
 
+Phase 2 decision commit: `fdc7ac71fc9f866cda24fb07885d878ffc697d5f`.
+
 ## Verification
 
 - `npm run lint` — passed.
