@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="UTF-8"/> 
+<title></title>
+<link rel="stylesheet" type="text/css" href="/h/jquery-ui-1.12.1.css">
+<link href="/h/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="/h/astrodienst2609010844.css">
+<link rel="stylesheet" type="text/css" href="/h/darkmode260901.css">
+<link rel="stylesheet" type="text/css" href="/h/font-awesome.css">
+<link href="/im/favicon.ico" rel="shortcut icon" type="image/x-icon">
+<link href="/manifest.json" rel="manifest">
+<script type="text/javascript" src="/h/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="/h/jquery-ui-1.14.1.min.js"></script>
+<script type="text/javascript" src="/h/jquery.hoverIntent.min.js"></script>
+<script type="text/javascript" src="/h/jquery.visible.min.js"></script>
+<script type="text/javascript" src="/h/jquery.imgbox.min.js"></script>
+<script type="text/javascript" src="/h/jquery.ui.touch-punch.min.js"></script>	
+<script type="text/javascript" src="/h/menu180207.js"></script>
+<link href="/h/jquery.imgbox.css" rel="stylesheet">
+<script type="text/javascript" src="/h/bootstrap.bundle.tooltip-fixed.js"></script>
+<meta http-equiv="Content-Language" content="en">
+<meta name="language" content="en">
+<meta name="distribution" content="global">
+<meta name="google-site-verification" content="vgh_SFgUOEezn8qLyJQEzrCz1cqBZvF-W5i7-r20Ffg" >
+<meta property="fb:app_id" content="239100866438509" />
+<meta name="viewport" content="initial-scale=1">
+<meta http-equiv="pragma" content="no-cache">
+<meta name="google" content="nopagereadaloud">
+<meta name="description" content="This page is one of many thousand pages at Astrodienst's website. Get your free horoscope - and much more! Astrodienst AG in Zürich, Switzerland provides the world's best astrology site for free horoscopes, professional astrological reports and information about astrology. ">
+<meta name="keywords" lang="en" content="astrology, horoscope, astrological reports, star signs, ascendant, zodiac, horoscopes, liz greene">
+<meta property="og:description" content="This page is one of many thousand pages at Astrodienst's website. Get your free horoscope - and much more! Astrodienst AG in Zürich, Switzerland provides the world's best astrology site for free horoscopes, professional astrological reports and information about astrology. " />
+<script type="text/javascript">
+  var unid_token='as5TNP8cB-CVU7Zr89c-ogAAA3s,1791906613,,xxo+5GZefQErP3rmAyKq1Q';
+  var ua_params=[0, 3, 15];
+  </script>
+<script type="text/javascript" src="/h/js.cookie-2.2.1.min.js"></script>
+<script type="text/javascript" src="/h/astrodienst260707.min.js"></script>
+<script type="text/javascript" src="/h/googleanalytics.js"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-B5RG4ZCVN7"></script>
+<script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-B5RG4ZCVN7'); </script>
+</head>
+<body alink="#ff0000" vlink="#000099" link="#000099"   class="help" style="overflow-x:auto;" onLoad="if (typeof init == 'function') init(); ">
+
+  <table width="100%" border="0" cellpadding="5" cellspacing="5">
+  <tr><td valign=top width="100%">
+  <p>&nbsp;
+  <h3><img src="/im/swefl300.gif" alt="Swiss Ephemeris">
+  <br>Test Output </h3>
+  <hr noshade>
+<pre >
+  <font face="courier" size="-1">
+
+/ulb/swetest -b1.1.2000 -n1 -s1 -fPl -p0123456m -eswe -sid1 -ut -bj2448002.875000000 
+date (dmy) 21.4.1990 greg.   9:00:00 UT		version 2.10.03
+UT:  2448002.875000000     delta t: 57.059586 sec
+TT:  2448002.875660412   ayanamsa =   23°43'29.3801 (Lahiri)
+Epsilon (m)       23°26'25.9481
+Sun               7.2741448
+Moon             314.8957904
+Mercury          23.6239215
+Venus            322.1538839
+Mars             306.6135262
+Jupiter          71.6763113
+Saturn           271.4629336
+mean Node        288.8917714
+
+  </font>
+</pre>
+<p>
+  </td></tr></table>
+  
+<!-- ASTRODIENST FOOTER BEGIN -->
+<div id="ftblue">
+    <script>
+        var BUGREP_LINK_PARAMS = 'lang=e&purl=xx68747470733a2f2f7777772e617374726f2e636f6d2f6367692f737765746573742e6367693f623d312e312e323030303b6e3d313b733d313b703d303132333435366d3b653d2d657377653b663d506c3b6172673d2d736964312532302d75742532302d626a323434383030322e3837353030303030303b6c616e673d65';
+    </script>
+<a href="#top" aria-label="on top"><i class="fa fa-lg fa-arrow-circle-up fleft mr-2" aria-hidden="true"></i></a>
+
+&nbsp;&nbsp;&nbsp;<i class="fa fa-lg fa-print fleft" aria-hidden="true" title="print" onClick="Javascript:window.print()"></i>&nbsp;
+<a target="_parent" href="https://www.astro.com/contact/user_e.htm" class="ftfont" title="Terms of use">Copyright &copy; 2026 Astrodienst AG</a>
+
+&nbsp;-
+<a href="https://www.astro.com/cgi/bugrep.cgi?lang=e&purl=xx68747470733a2f2f7777772e617374726f2e636f6d2f6367692f737765746573742e6367693f623d312e312e323030303b6e3d313b733d313b703d303132333435366d3b653d2d657377653b663d506c3b6172673d2d736964312532302d75742532302d626a323434383030322e3837353030303030303b6c616e673d65" target="bug" class="ftfont" title="Report a Problem to Astrodienst">report a problem</a>
+</div>

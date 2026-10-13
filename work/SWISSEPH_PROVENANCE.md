@@ -1,6 +1,6 @@
 # Swiss Ephemeris Provenance (working notes — not a compliance determination)
 
-Scope: license alignment plus Phase 3A upstream verification. No provider code has been vendored, unpacked into the build, or integrated. The archive-to-revision match below is verified; full application license compliance (Corresponding Source, network-source availability) is still open.
+Scope: license alignment plus Phase 3A upstream verification plus Phase 3B provider adapter. The adapter calls the pinned revision below; no provider code, binary, or data is committed to this repository. Full application license compliance (Corresponding Source, network-source availability) is still open.
 
 ## Local archive observed
 
@@ -38,7 +38,29 @@ Scope: license alignment plus Phase 3A upstream verification. No provider code h
 - Content match to official upstream revision: VERIFIED — 448/448 files, see above.
 - Redistribution conditions for the intended AGPL-3.0 route: STILL OPEN — required notices are preserved in the archive, but Corresponding Source handling and network-source availability (§13) are not yet implemented; see `RELEASE_CHECKLIST.md`. No provider code is integrated yet.
 
+## Phase 3B adapter (implemented, pinned to the revision above)
+
+- Adapter: `packages/swiss-ephemeris` (`SwissEphemerisProvider` behind the
+  provider-neutral `EphemerisProvider` contract). Single provider, no mixing.
+- Runtime inputs: one batched official `swetest` call per `positionAt`
+  (`-eswe -sid1 -ut -bj<jdUt> -p0123456m -fPl -ep -head`); Ketu derived as
+  exactly Rahu + 180° in integer microarcseconds; provenance records
+  provider `swiss-ephemeris 2.10.03 (upstream aacf962d)`, data
+  `DE441-2026-04-14 (upstream commit aacf962d...)`, and calculation settings.
+- Build: upstream sources unmodified; MinGW console build of official
+  `swetest.c` with build-only flags (`-Dfp=swe_console_fp`,
+  `-include winshim-decl.h`) plus a 3-line stdout shim (`winshim.c`) because
+  upstream's `_WINDOWS` path expects its GUI host's `fp` global. Full recipe
+  in `packages/swiss-ephemeris/BUILD.md`. Binary and `.se1` data live outside
+  the repository (`SWEPH_BIN` / `SWEPH_EPHE_PATH`).
+- Reference anchors (raw responses in `docs/reference-responses/`, goldens in
+  `tests/unit/swiss-ephemeris-golden.ts`): astro.com hosted swetest v2.10.03
+  worst difference 4.98e-8 deg (0.00018 arcsec) over 3 instants x 8 bodies;
+  JPL Horizons DE441 LT vectors worst difference 0.17 arcsec (Moon; all
+  others <= 0.06 arcsec). First-principles Lahiri ayanamsha check from a
+  different lineage is recorded as a pending test, not claimed.
+
 ## Project license intent (subject to the above)
 
 - Intended application license: AGPL-3.0-only (see `LICENSE`, `package.json`, `DECISIONS.md` ADR-003).
-- The upstream revision above is verified, but redistribution readiness is not: do not ship or use Swiss Ephemeris code or data in a public service until Corresponding Source and network-source availability are implemented and the provider adapter lands in a separately approved task.
+- The upstream revision above is verified and the adapter is implemented, but redistribution readiness is not: do not ship or use Swiss Ephemeris code or data in a public service until Corresponding Source and network-source availability are implemented.

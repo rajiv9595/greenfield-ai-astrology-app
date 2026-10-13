@@ -1,10 +1,10 @@
 # Status
 
 ## Current task
-Phase 1 engineering foundation.
+Phase 3B provider adapter and reference tests.
 
 ## State
-Phase 1 foundation is complete. Phase 2 decision work is complete: ADR-003 locks the proposed reproducibility contract and Version 1 calculation conventions. Provider-neutral calculation contracts, input validation, and boundary tests are implemented. No database, AI provider, ephemeris provider, secrets, planetary calculations, or deployments are configured.
+Phase 3B is complete. A production-quality Swiss Ephemeris adapter (`packages/swiss-ephemeris`) implements the existing provider-neutral `EphemerisProvider` contract against pinned upstream revision `aacf962d19d79f8bc921dbcdaacf306d85be1917` (sidereal Lahiri, geocentric, whole-sign conventions preserved; mean node with Ketu derived as exactly Rahu + 180°; integer microarcsecond storage). Reference tests anchor the build against two independent sources: astro.com hosted swetest (worst difference 0.00018 arcsec over 3 instants x 8 bodies) and JPL Horizons DE441 vectors (worst difference 0.17 arcsec, Moon; all others <= 0.06 arcsec). The compiled binary and `.se1` data remain outside the repository and are referenced via `SWEPH_BIN` / `SWEPH_EPHE_PATH`. No database, AI provider, secrets, dashas, transits, or deployments are configured.
 
 ## Commit
 
@@ -16,7 +16,7 @@ Phase 2 decision commit: `fdc7ac71fc9f866cda24fb07885d878ffc697d5f`.
 
 - `npm run lint` — passed.
 - `npm run typecheck` — passed.
-- `npm test` — passed (3 files, 7 tests).
+- `npm test` — passed (5 files, 24 tests, 1 todo; adapter live/reference tests run when SWEPH_BIN and SWEPH_EPHE_PATH point at the pinned build, otherwise skipped).
 - `npm run lint` — passed.
 - `npm run typecheck` — passed.
 - `npm run build` — passed.
@@ -24,7 +24,7 @@ Phase 2 decision commit: `fdc7ac71fc9f866cda24fb07885d878ffc697d5f`.
 - `npm run test:e2e` — not run; browser binaries have not been installed.
 
 ## Remaining risks
-No production credentials, database, AI provider, or astrology calculation provider is configured.
+No production credentials, database, AI provider, or deployments are configured. The provider binary and ephemeris data are build-machine artifacts, not yet part of any deployment story; AGPL Corresponding Source and network-source availability remain open.
 
 ## Next single action
-Complete upstream verification for the existing Swiss Ephemeris archive (revision, release version, data version, content match) and record it in `work/SWISSEPH_PROVENANCE.md`. The provider adapter remains blocked until then.
+Founder review of Phase 3B, then explicit approval before Phase 3C begins.
