@@ -220,9 +220,3 @@ describe.skipIf(!LIVE)("swiss-ephemeris JPL Horizons anchor", () => {
   });
 });
 
-describe("swiss-ephemeris pending verification", () => {
-  it.todo(
-    "first-principles Lahiri ayanamsha check from a different lineage " +
-      "(current anchors: independent astro.com run + JPL Horizons vectors)",
-  );
-});

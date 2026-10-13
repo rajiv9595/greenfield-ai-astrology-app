@@ -57,8 +57,15 @@ Scope: license alignment plus Phase 3A upstream verification plus Phase 3B provi
   `tests/unit/swiss-ephemeris-golden.ts`): astro.com hosted swetest v2.10.03
   worst difference 4.98e-8 deg (0.00018 arcsec) over 3 instants x 8 bodies;
   JPL Horizons DE441 LT vectors worst difference 0.17 arcsec (Moon; all
-  others <= 0.06 arcsec). First-principles Lahiri ayanamsha check from a
-  different lineage is recorded as a pending test, not claimed.
+  others <= 0.06 arcsec).
+- Phase 3C first-principles Lahiri verification (fresh IAU 1976 + IAU 2000B
+  implementation in `tests/unit/ayanamsha-theory.ts`, goldens in
+  `tests/unit/ayanamsha-anchors.ts`): MEAN vs binary worst 0.29" (9 TT
+  epochs 1900–2030, 2" tolerance); TRUE vs adapter worst 0.29" (7 UTC
+  epochs); nutation transcription worst 0.00011" (0.01" tolerance); five
+  printed literature anchors (IENA 1965, Int'l Ephemeris, IAE 1989 ×2,
+  IAE 2019) worst 0.54". The 3B TODO is resolved; no provider-interface
+  change was needed.
 
 ## Project license intent (subject to the above)
 
