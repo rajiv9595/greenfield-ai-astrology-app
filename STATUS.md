@@ -4,7 +4,7 @@
 Phase 1 engineering foundation.
 
 ## State
-Phase 1 foundation complete locally. The Git repository, Next.js application shell, CI workflow, lockfile, health/readiness endpoints, environment template, and project-control documents are present. No database, AI provider, ephemeris provider, secrets, or deployments are configured.
+Phase 1 foundation is complete. Phase 2 decision work is complete: ADR-003 locks the proposed reproducibility contract and Version 1 calculation conventions. No database, AI provider, ephemeris provider, secrets, calculations, or deployments are configured.
 
 ## Commit
 
@@ -22,4 +22,4 @@ Initial foundation commit: `0425268c6c22d36690386317287cb9dd0f5dd4f7` (this stat
 No production credentials, database, AI provider, or astrology calculation provider is configured.
 
 ## Next single action
-Approve Phase 2 planning: choose the ephemeris provider, licence path, and exact calculation conventions before adding chart logic.
+Founder approval: obtain/authorize the Swiss Ephemeris Professional License path, then implement the provider-neutral calculation contract and reference-vector harness.
