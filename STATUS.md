@@ -27,4 +27,4 @@ Phase 2 decision commit: `fdc7ac71fc9f866cda24fb07885d878ffc697d5f`.
 No production credentials, database, AI provider, or astrology calculation provider is configured.
 
 ## Next single action
-Founder action: authorize the Swiss Ephemeris Professional License path. The licence gate remains before any provider adapter or public service use.
+Complete upstream verification for the existing Swiss Ephemeris archive (revision, release version, data version, content match) and record it in `work/SWISSEPH_PROVENANCE.md`. The provider adapter remains blocked until then.

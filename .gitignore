@@ -8,4 +8,6 @@ test-results/
 .env.local
 .env.*.local
 !.env.example
+# Local Swiss Ephemeris working archive must not be committed (see work/SWISSEPH_PROVENANCE.md).
+work/*.zip
 
