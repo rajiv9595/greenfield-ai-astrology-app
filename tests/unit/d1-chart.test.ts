@@ -10,8 +10,12 @@
  *   (./swiss-ephemeris-golden.ts) for planetary longitudes.
  * - Documented convention (ADR-003) as oracle for sign/nakshatra/pada
  *   boundaries, whole-sign houses, and the mean-node opposition rule.
- * - Phase 3C test-support implementation as a copy-fidelity guard only
- *   (explicitly NOT independent: same team, same derivation).
+ *
+ * (The former Phase 3C copy-fidelity guard was retired in the Phase 3E
+ * consolidation: the duplicate test-support implementation it pinned no
+ * longer exists, and the guard asserted nothing about accuracy. Phase 3C
+ * accuracy validation now exercises the production ayanamsha module
+ * directly against the independent oracles above.)
  *
  * Privacy: generic golden instants and the public Hyderabad fixture
  * coordinates (17.385 N, 78.4867 E, already in birth-input.test.ts)
@@ -32,8 +36,6 @@ import { tropicalAscendantDeg } from "../../packages/astrology-core/src/ascendan
 import {
   deltaTSeconds,
   nutation2000B,
-  predictMeanAyanamsha,
-  predictTrueAyanamsha,
   trueAyanamshaAtUt,
 } from "../../packages/astrology-core/src/ayanamsha";
 import {
@@ -43,7 +45,6 @@ import {
   PADA_WIDTH_MICROARCSECONDS,
   SIGN_WIDTH_MICROARCSECONDS,
 } from "../../packages/astrology-core/src/constants";
-import { NUT2000B_ROWS } from "../../packages/astrology-core/src/nutation-iau2000b";
 import { V1_CONFIGURATION } from "../../packages/astrology-core/src/configuration";
 import type {
   BirthInput,
@@ -53,19 +54,11 @@ import {
   ASTRO_TOLERANCE_DEG,
   GOLDEN_INSTANTS,
 } from "./swiss-ephemeris-golden";
-import { NUT2000B_ROWS as PHASE3C_ROWS } from "./ayanamsha-nut2000b";
-import {
-  nutation2000B as phase3cNutation,
-  predictMeanAyanamsha as phase3cMean,
-  predictTrueAyanamsha as phase3cTrue,
-} from "./ayanamsha-theory";
 
 /** Geometry agreement for a fresh implementation vs C binary. */
 const TROP_GEOMETRY_TOLERANCE_DEG = 1 / 3600;
 /** Sidereal conversion agreement (adds ayanamsha transcription). */
 const SIDEREAL_CONVERSION_TOLERANCE_DEG = 2 / 3600;
-/** Copy-fidelity guard: identical arithmetic, same runtime. */
-const FIDELITY_TOLERANCE_DEG = 1e-12;
 
 const LIVE = Boolean(process.env.SWEPH_BIN && process.env.SWEPH_EPHE_PATH);
 
@@ -195,24 +188,6 @@ function constantStub(
 function degToMicroarcseconds(degrees: number): number {
   return Math.round(degrees * MICROARCSECONDS_PER_DEGREE);
 }
-
-describe("d1-chart production copy fidelity (non-independent guard)", () => {
-  it("keeps the IAU-2000B table identical to the Phase 3C table", () => {
-    expect(NUT2000B_ROWS).toEqual(PHASE3C_ROWS);
-  });
-
-  it("reproduces the Phase 3C ayanamsha arithmetic exactly", () => {
-    for (const jdTt of [2415020.5, 2433282.5, 2435553.5, 2451545.0, 2462502.5]) {
-      expect(predictMeanAyanamsha(jdTt)).toBeCloseTo(phase3cMean(jdTt), 12);
-      expect(predictTrueAyanamsha(jdTt)).toBeCloseTo(phase3cTrue(jdTt), 12);
-      const mine = nutation2000B(jdTt);
-      const ref = phase3cNutation(jdTt);
-      expect(mine.dpsiDeg).toBeCloseTo(ref.dpsiDeg, 12);
-      expect(mine.depsDeg).toBeCloseTo(ref.depsDeg, 12);
-    }
-    expect(FIDELITY_TOLERANCE_DEG).toBe(1e-12);
-  });
-});
 
 describe("d1-chart time conversion (offline)", () => {
   it("converts the public IST fixture to the golden UTC instant", () => {

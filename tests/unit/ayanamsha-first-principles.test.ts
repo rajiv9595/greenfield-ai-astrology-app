@@ -1,21 +1,34 @@
 /**
- * First-principles Lahiri ayanamsha verification (Phase 3C).
+ * First-principles Lahiri ayanamsha verification (Phase 3C, consolidated).
  *
- * The adapter's ayanamsha is checked against a fresh implementation of the
- * documented definition (./ayanamsha-theory.ts) instead of against itself:
+ * The production implementation
+ * (packages/astrology-core/src/ayanamsha.ts) is checked against the
+ * documented definition instead of against itself:
  *
  *   CRC-1956 anchor: t0 = JD 2435553.5 TDT, ayan_t0 = 23.245524743° (mean),
  *   precessed under the published IAU 1976 theory; TRUE adds published
  *   IAU 2000B nutation.
  *
- * Layers (see theory file header for the circularity protocol):
+ * Independence note: accuracy comes from the external oracles below
+ * (published polynomials and spot values, the pinned binary, printed
+ * literature), not from a second implementation. The former duplicate
+ * test-support copy (ayanamsha-theory.ts / ayanamsha-nut2000b.ts) was
+ * retired in the Phase 3E consolidation because its only unique role
+ * was a copy-fidelity pin, which asserts nothing about accuracy; every
+ * accuracy assertion here compares production code against an
+ * implementation-independent reference.
+ *
+ * Layers:
  * L0 offline math checks (no binary): rotation sanity, roundtrips,
  *   published angle/JD/anchor spot values.
- * L1 transcription check (binary): my IAU2000B Δψ vs the binary's implied
- *   Δψ (TRUE − MEAN). Same published series both sides ⇒ 0.01" tolerance.
- * L2 first-principles MEAN (binary): my MEAN vs `-nonut` MEAN, 9 TT epochs.
- * L3 first-principles TRUE (binary): my TRUE vs adapter TRUE, 7 UTC epochs.
- * L4 literature anchors (binary + mine): printed IAE/IENA values.
+ * L1 transcription check (binary): production IAU2000B Δψ vs the
+ *   binary's implied Δψ (TRUE − MEAN). Same published series both
+ *   sides ⇒ 0.01" tolerance.
+ * L2 first-principles MEAN (binary): production MEAN vs `-nonut` MEAN,
+ *   9 TT epochs.
+ * L3 first-principles TRUE (binary): production TRUE vs adapter TRUE,
+ *   7 UTC epochs.
+ * L4 literature anchors (binary + production): printed IAE/IENA values.
  *
  * Golden epochs, ΔT, literature values, and tolerances:
  * ./ayanamsha-anchors.ts. No provider-interface change was needed: TRUE is
@@ -31,19 +44,8 @@ import {
   utcInstantToJulianDay,
 } from "../../packages/swiss-ephemeris/src/provider";
 import {
-  AYANAMSHA_EPOCHS,
-  FIRST_PRINCIPLES_TOLERANCE_DEG,
-  LITERATURE_ANCHORS,
-  LITERATURE_TOLERANCE_DEG,
-  NUTATION_TRANSCRIPTION_TOLERANCE_DEG,
-  TRUE_TOLERANCE_DEG,
-} from "./ayanamsha-anchors";
-import { NUT2000B_ROWS, NUT2000B_TERM_COUNT } from "./ayanamsha-nut2000b";
-import {
   LAHIRI_AYAN_T0_DEG,
-  LAHIRI_AYAN_T0_HEADER_DECIMAL,
   LAHIRI_T0_JD,
-  julianDayTT,
   nutation2000B,
   predictMeanAyanamsha,
   predictTrueAyanamsha,
@@ -51,7 +53,20 @@ import {
   precessionMatrixDateToJ2000,
   precessionMatrixJ2000ToDate,
   rotationZ,
-} from "./ayanamsha-theory";
+} from "../../packages/astrology-core/src/ayanamsha";
+import {
+  NUT2000B_ROWS,
+  NUT2000B_TERM_COUNT,
+} from "../../packages/astrology-core/src/nutation-iau2000b";
+import {
+  AYANAMSHA_EPOCHS,
+  FIRST_PRINCIPLES_TOLERANCE_DEG,
+  LAHIRI_AYAN_T0_HEADER_DECIMAL,
+  LITERATURE_ANCHORS,
+  LITERATURE_TOLERANCE_DEG,
+  NUTATION_TRANSCRIPTION_TOLERANCE_DEG,
+  TRUE_TOLERANCE_DEG,
+} from "./ayanamsha-anchors";
 
 const LIVE = Boolean(process.env.SWEPH_BIN && process.env.SWEPH_EPHE_PATH);
 const MICROARCSECONDS_PER_DEGREE = 3_600_000_000;
@@ -102,6 +117,39 @@ function parseDecimalLine(stdout: string, wanted: string): number {
 function angularDifferenceDeg(a: number, b: number): number {
   const raw = Math.abs(a - b) % 360;
   return raw > 180 ? 360 - raw : raw;
+}
+
+/**
+ * Test-only calendar helper (kept here, not in production): proleptic-
+ * Gregorian calendar date to Julian Day (TT scale input as civil date +
+ * fractional hour). Valid for the tested range 1900–2030; Meeus Ch.7.
+ * Moved verbatim from the retired test-support copy during the Phase 3E
+ * consolidation; it is itself validated against published Julian Days in
+ * the L0 test below, and production never needs it (production converts
+ * civil time to UTC milliseconds, then adds ΔT from its own table).
+ */
+function julianDayTT(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+): number {
+  let y = year;
+  let m = month;
+  if (m <= 2) {
+    y -= 1;
+    m += 12;
+  }
+  const a = Math.floor(y / 100);
+  const b = 2 - a + Math.floor(a / 4);
+  return (
+    Math.floor(365.25 * (y + 4716)) +
+    Math.floor(30.6001 * (m + 1)) +
+    day +
+    b -
+    1524.5 +
+    hour / 24
+  );
 }
 
 /** Adapter-implied TRUE ayanamsha: tropical − sidereal Sun, full precision. */

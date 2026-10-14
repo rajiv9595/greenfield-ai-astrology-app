@@ -1,14 +1,14 @@
 # Status
 
 ## Current task
-Fix invalid `runner` context in the live CI job (first remote run failed validation).
+Hardening: consolidate the duplicated ayanamsha/nutation implementations.
 
 ## State
-Phase 3E, CI provisioning (`d7de638`), and the CI gate fix (`4e3e5c6`) are complete. The first real GitHub Actions run failed before jobs started: job-level `env:` does not accept the `runner` context (`ci.yml` lines 33–34). This follow-up removes the invalid job-level `SWEPH_BIN`/`SWEPH_EPHE_PATH` expressions and adds an early `Export live ephemeris paths` step that writes both values from the runner-provided `$RUNNER_TEMP` into `$GITHUB_ENV` before provisioning and tests; all shell temporary paths now use `$RUNNER_TEMP` consistently, with no machine-specific paths. Provisioning, revision/version checks, the summary parser, its self-tests, skip/fail strictness, and the offline job are unchanged.
+Prior work complete through the CI runner-context fix (`445d1f1`, pushed to `origin/main`). This hardening task retires the duplicated test-support ayanamsha implementation (`tests/unit/ayanamsha-theory.ts`) and nutation table (`tests/unit/ayanamsha-nut2000b.ts`): `packages/astrology-core/src/ayanamsha.ts` and `src/nutation-iau2000b.ts` are now the single canonical sources (no production imports from `tests/`, no algorithm or convention changes — the two copies were arithmetically identical). Independent accuracy is preserved and now validates production directly: the Phase 3C L0–L4 tests still assert against published polynomials/spot values, the pinned binary (MEAN/TRUE/nutation transcription), and the five printed literature anchors with unchanged tolerances; reference epochs, ΔT values, anchors, and tolerances are byte-preserved in `ayanamsha-anchors.ts`, which additionally hosts the moved upstream-header reference decimal with provenance. The only deleted assertions are the two self-declared non-independent copy-fidelity tests. Remaining test-only code is labeled where it lives: the `julianDayTT` calendar helper in the first-principles test file and the header-decimal reference in the anchors file. Out of scope and untouched: obliquity/JD-constant/V1-gate/parser/ΔT/retrograde/E2E/CI items remain tracked separately.
 
 ## Commit
 
-Starting checkpoint: `4e3e5c6dd892a18d0c5443d994ac7c10feac8da7`.
+Starting checkpoint: `445d1f1191c299fea3854959c53ee20c5a369b39`.
 
 Phase 2 decision commit: `fdc7ac71fc9f866cda24fb07885d878ffc697d5f`.
 
@@ -16,7 +16,7 @@ Phase 2 decision commit: `fdc7ac71fc9f866cda24fb07885d878ffc697d5f`.
 
 - `npm run lint` — passed.
 - `npm run typecheck` — passed.
-- `npm test` — passed with pinned binary (8 files, 69 tests, 0 skipped): prior 53 tests unchanged plus 16 new Vimshottari tests (sequence table, all-9 lords, all-27 mapping, left-inclusive boundaries, hand-computed balances, MD order with exact 120-year cycle, hand-computed Venus-MD Antardashas, birth-active Antardasha with pre-birth chronology, half-open transitions, determinism, leap-day and year-boundary cases, D1 wiring, rejections).
+- `npm test` — passed with pinned binary (8 files, 67 tests, 0 skipped): prior suite minus the 2 retired non-independent copy-fidelity tests; all Phase 3C L0–L4 accuracy tests pass against the consolidated production module (MEAN/TRUE ≤0.29", nutation transcription, 5 literature anchors), plus all D1, Dasha, adapter, and reference tests unchanged.
 - `npm run build` — passed.
 - `npm run test:e2e` — NOT RUN; browser binaries have not been installed.
 - CI hardening (uncommitted verification, same tree): offline `npm test -- --reporter=verbose` without ephemeris env gives 52 passed / 17 skipped (the 17 live-gated tests); live run with pinned binary gives 69 passed / 0 skipped. Remote CI has not run yet (no remote is configured); first real CI run must confirm both jobs green.
@@ -28,4 +28,4 @@ Phase 2 decision commit: `fdc7ac71fc9f866cda24fb07885d878ffc697d5f`.
 No production credentials, database, AI provider, or deployments are configured. The provider binary and ephemeris data are build-machine artifacts, not yet part of any deployment story; AGPL Corresponding Source and network-source availability remain open. D1 algorithm tolerance (arcseconds) is separate from birth time/coordinate uncertainty (arcminutes); pole latitudes rejected; host TZDB version unknowable via ECMAScript. CI live verification is newly configured but not yet observed on a real runner; the first remote run failed workflow validation before jobs started, and this fix is also unobserved remotely; E2E browsers still not installed.
 
 ## Next single action
-Founder review of the runner-context fix (not pushed). Do not trigger another remote CI run before review.
+Founder review of the ayanamsha consolidation (not pushed). Do not begin another task before review.

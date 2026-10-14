@@ -1,19 +1,22 @@
 /**
  * Production Lahiri/Chitrapaksha ayanamsha model (D1 engine).
  *
- * Lineage: ported from the Phase 3C validated test implementation
- * (tests/unit/ayanamsha-theory.ts), which was written fresh from
- * published standards and verified against the pinned Swiss Ephemeris
- * binary (MEAN 0.29", TRUE 0.29" over 1900–2030) and five printed
- * literature anchors (worst 0.54"). Definition: Calendar Reform
+ * Canonical implementation: written fresh from published standards in
+ * Phase 3C and verified against the pinned Swiss Ephemeris binary
+ * (MEAN 0.29", TRUE 0.29" over 1900–2030) and five printed literature
+ * anchors (worst 0.54"); see tests/unit/ayanamsha-first-principles.test.ts,
+ * which exercises this module directly against those independent oracles.
+ * (The former duplicate test-support copy was retired in the Phase 3E
+ * consolidation; its only unique role was a copy-fidelity pin, which
+ * asserted nothing about accuracy.) Definition: Calendar Reform
  * Committee 1956 via Indian Astronomical Ephemeris 1989 p.556 —
  *   t0 = JD 2435553.5 TDT, ayan_t0 = 23°15'00.658" − nutation(t0),
  * precessed under IAU 1976 (Lieske); TRUE adds IAU 2000B nutation
  * (McCarthy & Luzum, IERS Conventions 2003; table in
  * ./nutation-iau2000b.ts).
  *
- * A copy-fidelity test pins every exported function here against the
- * Phase 3C implementation. Any change must re-run that verification.
+ * Any change must re-run the first-principles verification and the D1
+ * reference tests.
  */
 
 import { NUT2000B_ROWS } from "./nutation-iau2000b";

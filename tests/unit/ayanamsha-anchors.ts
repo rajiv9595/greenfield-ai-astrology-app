@@ -173,3 +173,15 @@ export const FIRST_PRINCIPLES_TOLERANCE_DEG = 2 / 3600;
 export const TRUE_TOLERANCE_DEG = 2 / 3600;
 export const LITERATURE_TOLERANCE_DEG = 2 / 3600;
 export const NUTATION_TRANSCRIPTION_TOLERANCE_DEG = 0.01 / 3600;
+
+/**
+ * Test-only reference value (kept here with the other reference data, not
+ * in production): the upstream Swiss Ephemeris header's decimal form of
+ * the mean anchor value, against which the DMS-form anchor constant is
+ * transcribed. Moved here verbatim during the Phase 3E consolidation so
+ * the retired test-support copy is not needed for the transcription
+ * check. Provenance: upstream header decimal 23.250182778 minus the
+ * Wahr-1980 nutation at t0 (0.004658035°); agreement with the DMS form
+ * is asserted to ~2e-10 deg in the L0 transcription test.
+ */
+export const LAHIRI_AYAN_T0_HEADER_DECIMAL = 23.250182778 - 0.004658035;

@@ -1,5 +1,7 @@
 /**
- * IAU 2000B lunisolar nutation series (77 terms) — production copy.
+ * IAU 2000B lunisolar nutation series (77 terms) — canonical production
+ * table (the former duplicate test-support copy was retired in the Phase
+ * 3E consolidation).
  *
  * Coefficients are the published IAU 2000B series (McCarthy & Luzum,
  * IERS Conventions 2003): argument multipliers [moonAnomaly,
@@ -8,12 +10,14 @@
  * 0.1 microarcseconds (1e-7 arcseconds). dpsi += (c0 + c1*T)*sin(arg)
  * + c2*cos(arg); deps += (c3 + c4*T)*cos(arg) + c5*sin(arg).
  *
- * Lineage: this table is an exact copy of the Phase 3C validated test
- * table (tests/unit/ayanamsha-nut2000b.ts), itself machine-extracted
- * from the pinned upstream table swenut2000a.h (marked "derived from
- * public sources", first NLS_2000B rows). Any edit here must re-run the
- * Phase 3C first-principles verification and the D1 reference tests.
- * A copy-fidelity test pins this table against the Phase 3C table.
+ * Lineage: machine-extracted from the pinned upstream table
+ * swenut2000a.h (marked "derived from public sources", first NLS_2000B
+ * rows) and validated behaviorally (see
+ * tests/unit/ayanamsha-first-principles.test.ts, which exercises this
+ * table directly against the binary-implied nutation). Not
+ * hand-transcribed: exact integer preservation is asserted below.
+ * Any edit here must re-run the first-principles verification and the
+ * D1 reference tests.
  */
 export const NUT2000B_ROWS: readonly (readonly [
   number, number, number, number, number,
