@@ -55,3 +55,23 @@ Until then, this project may implement provider-neutral contracts, pure boundary
 
 - Swiss Ephemeris [official licence notice](https://github.com/aloistr/swisseph/blob/master/LICENSE)
 - Swiss Ephemeris [official programmer documentation](https://www.astro.com/swisseph/swephprg.htm)
+
+## ADR-004: D1 engine and frozen time-input convention
+
+**Status:** Accepted for Phase 3D implementation (founder-approved after the Step 1 Ascendant reference review).
+
+### Time-input convention (frozen)
+
+Birth date, civil wall time, and named IANA zone convert to UTC via the host zone database; the resulting Julian Day is used directly as the UT input for both house geometry and provider calls. No separate historical DUT1 correction is applied. Nonexistent local times (zone gaps) are rejected; the ECMAScript API exposes no TZDB version, so provenance records that honestly instead of inventing one.
+
+### Ascendant recipe (frozen, Step 1 reference)
+
+Tropical Ascendant from IAU-1982 GMST on the UT Julian Day, Lieske mean obliquity plus the project's IAU-2000B nutation correction, apparent RAMC (east longitude plus equation of the equinoxes Δψ·cos ε), and the standard geocentric Ascendant formula. Sidereal conversion subtracts the engine's own validated TRUE Lahiri ayanamsha (CRC-1956 anchor, IAU-1976 precession, IAU-2000B nutation; TT = UT + interpolated NASA ΔT). The binary's built-in sidereal-house Ascendant is a diagnostic comparison only and must never be substituted for the project's true-ayanamsha result.
+
+### Engine rules
+
+Planets come exclusively from the injected provider under the V1 configuration; Ketu stays exactly Rahu + 180°; retrograde is measured provider motion over +1 day, never inferred from a sign; signs/nakshatras/padas use integer microarcseconds with left-inclusive boundaries; houses are whole-sign from the Ascendant sign; pole latitudes are rejected.
+
+### Tolerances and limitations
+
+Algorithm tolerances (new quantities, not a weakening of Phase 3B/3C): tropical geometry 1", sidereal conversion 2", planets per the astro.com anchor (0.018"). These are separate from birth time/coordinate uncertainty, which dominates real charts (1 s of time moves the Ascendant ~15"; town-centre uncertainty moves it tens of arcseconds). ΔT interpolation/clamping error is nil (~1.6e-6" per second) against tolerance. Out of scope: Vargas, dashas, yogas/doshas, interpretation, and UI.
