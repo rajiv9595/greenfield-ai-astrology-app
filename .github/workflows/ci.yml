@@ -18,3 +18,53 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  # Live ephemeris verification (audit finding E1): provisions the exact
+  # pinned upstream Swiss Ephemeris revision and verified ephemeris data,
+  # then runs the full suite with SWEPH_BIN/SWEPH_EPHE_PATH set so the 17
+  # live-gated tests execute instead of skipping. Kept as a separate job
+  # so offline and live failures diagnose independently. The offline
+  # fail-closed behavior for missing assets is unchanged and still
+  # covered by the offline job above.
+  live-ephemeris:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SWEPH_BIN: ${{ runner.temp }}/sweph-checkout/swetest
+      SWEPH_EPHE_PATH: ${{ runner.temp }}/sweph-checkout/ephe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Check pinned revision matches build-info.ts
+        run: |
+          script_sha="$(grep -oE '[0-9a-f]{40}' scripts/provision-sweph.sh | head -n 1)"
+          script_version="$(grep -oE 'EXPECTED_VERSION="[0-9.]+"' scripts/provision-sweph.sh | head -n 1 | grep -oE '[0-9.]+')"
+          grep -qF "$script_sha" packages/swiss-ephemeris/src/build-info.ts
+          grep -qF "$script_version" packages/swiss-ephemeris/src/build-info.ts
+          echo "pinned revision $script_sha (library $script_version) matches build-info.ts"
+      - name: Provision and verify pinned Swiss Ephemeris
+        run: bash scripts/provision-sweph.sh "${{ runner.temp }}/sweph-checkout" "packages/swiss-ephemeris/ephe-sha256.txt"
+      - name: Run full suite with live ephemeris
+        run: npm test -- --reporter=verbose 2>&1 | tee "${{ runner.temp }}/live-test-output.txt"
+      - name: Assert live suites executed with no skips
+        run: |
+          sed -e 's/\x1b\[[0-9;]*[A-Za-z]//g' "${{ runner.temp }}/live-test-output.txt" > "${{ runner.temp }}/live-test-clean.txt"
+          grep -E "Test Files|Tests " "${{ runner.temp }}/live-test-clean.txt"
+          if grep -qi "skipped" "${{ runner.temp }}/live-test-clean.txt"; then
+            echo "live job skipped tests; failing" >&2
+            exit 1
+          fi
+          for line in "Test Files" "Tests "; do
+            summary="$(grep -E "$line +[0-9]+ passed" "${{ runner.temp }}/live-test-clean.txt" | tail -n 1)"
+            passed="$(echo "$summary" | grep -oE '[0-9]+' | head -n 1)"
+            total="$(echo "$summary" | grep -oE '[0-9]+' | tail -n 1)"
+            if [ "$passed" != "$total" ]; then
+              echo "not all collected tests passed: $summary" >&2
+              exit 1
+            fi
+          done
+          echo "all collected tests passed with no skips; live verification enforced"

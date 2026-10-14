@@ -43,7 +43,6 @@ gcc -Dfp=swe_console_fp -include<tmp>/winshim-decl.h -g -Wall \
 swetest -edir<ephePath> -eswe -sid1 -ut -bj<jdUt, 9 decimals> \
   -p0123456m -fPl -ep -head
 ```
-
 - `-eswe`: Swiss (compressed DE441) files, the only provider in use.
 - `-sid1`: sidereal zodiac, Lahiri/Chitrapaksha (method 1).
 - `-ut` with `-bj<jd>`: input Julian Day is Universal Time; swetest adds
@@ -57,3 +56,38 @@ swetest -edir<ephePath> -eswe -sid1 -ut -bj<jdUt, 9 decimals> \
   `-noaberr -nodefl -nonut -j2000` (geometric light-time-corrected J2000
   ecliptic longitudes, matching JPL Horizons LT vectors on REF_PLANE
   ECLIPTIC). It is not part of the adapter's production path.
+
+## Reproducible live verification in CI (audit finding E1)
+
+The default `verify` CI job intentionally runs the suite without ephemeris
+assets, so live-gated tests skip there and the offline fail-closed behavior
+stays covered. A separate `live-ephemeris` CI job provisions the exact
+pinned sources and data, then runs the full suite with the live
+environment so all 17 live-gated tests execute (a green job that still
+skips them fails its assertion step).
+
+Provisioning (`scripts/provision-sweph.sh`, no repository writes):
+
+1. Shallow-fetches exactly `SWISS_EPHEMERIS_UPSTREAM_REVISION`
+   (`build-info.ts`; a CI step fails if the script's revision or library
+   version drifts from that file) from the official upstream repository
+   into a runner-temp directory (never committed).
+2. Fails unless `git rev-parse HEAD` equals the pinned revision and the
+   tree is clean — git content addressing is the revision-identity proof.
+3. Fails unless every file under `ephe/` matches `ephe-sha256.txt`
+   (`sha256sum -c`). That manifest (262 files) was generated from the
+   Phase 3A archive-to-revision verification, which matched all 448
+   upstream blobs including all 262 `ephe/` entries, so it is the upstream
+   data manifest for the pinned commit.
+4. Builds `swetest` with the unmodified upstream Linux Makefile
+   (`make swetest`; the MinGW `winshim` documented above is a Windows-only
+   build artifact and is not used) and fails unless the binary reports
+   the pinned library version (`2.10.03`).
+5. Prints `SWEPH_BIN` / `SWEPH_EPHE_PATH`; the workflow passes them as job
+   environment — no developer-machine paths anywhere.
+
+The job then runs `npm test -- --reporter=verbose` and asserts the
+summary counts (`Test Files` and `Tests` passed equal collected, e.g.
+69 passed of 69) with zero occurrences of "skipped". Skip logic, tests,
+and expectations are unchanged: the same suite runs offline (skipping
+live tests) and live (executing them).
