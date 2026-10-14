@@ -29,9 +29,6 @@ jobs:
   live-ephemeris:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      SWEPH_BIN: ${{ runner.temp }}/sweph-checkout/swetest
-      SWEPH_EPHE_PATH: ${{ runner.temp }}/sweph-checkout/ephe
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,6 +36,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Export live ephemeris paths
+        run: |
+          echo "SWEPH_BIN=$RUNNER_TEMP/sweph-checkout/swetest" >> "$GITHUB_ENV"
+          echo "SWEPH_EPHE_PATH=$RUNNER_TEMP/sweph-checkout/ephe" >> "$GITHUB_ENV"
       - name: Check pinned revision matches build-info.ts
         run: |
           script_sha="$(grep -oE '[0-9a-f]{40}' scripts/provision-sweph.sh | head -n 1)"
@@ -47,12 +48,12 @@ jobs:
           grep -qF "$script_version" packages/swiss-ephemeris/src/build-info.ts
           echo "pinned revision $script_sha (library $script_version) matches build-info.ts"
       - name: Provision and verify pinned Swiss Ephemeris
-        run: bash scripts/provision-sweph.sh "${{ runner.temp }}/sweph-checkout" "packages/swiss-ephemeris/ephe-sha256.txt"
+        run: bash scripts/provision-sweph.sh "$RUNNER_TEMP/sweph-checkout" "packages/swiss-ephemeris/ephe-sha256.txt"
       - name: Run full suite with live ephemeris
-        run: npm test -- --reporter=verbose 2>&1 | tee "${{ runner.temp }}/live-test-output.txt"
+        run: npm test -- --reporter=verbose 2>&1 | tee "$RUNNER_TEMP/live-test-output.txt"
       - name: Assert live suites executed with no skips
         run: |
-          sed -e 's/\x1b\[[0-9;]*[A-Za-z]//g' "${{ runner.temp }}/live-test-output.txt" > "${{ runner.temp }}/live-test-clean.txt"
+          sed -e 's/\x1b\[[0-9;]*[A-Za-z]//g' "$RUNNER_TEMP/live-test-output.txt" > "$RUNNER_TEMP/live-test-clean.txt"
           # Parses one Vitest summary line ("Tests  69 passed (69)",
           # "Tests  52 passed | 17 skipped (69)") from a file and fails
           # unless every collected test passed with none skipped or
@@ -87,7 +88,7 @@ jobs:
           # it on the real output. gate_case <name> <want-exit> <content>.
           gate_case() {
             local name="$1" want="$2" content="$3"
-            local casefile="${{ runner.temp }}/gate-case.txt"
+            local casefile="$RUNNER_TEMP/gate-case.txt"
             printf '%s\n' "$content" > "$casefile"
             local got=0
             assert_summary "Tests " "$casefile" >/dev/null 2>&1 || got=1
@@ -107,10 +108,10 @@ jobs:
           # Exercise the direct-call path (errexit active, as in the real
           # check below): a valid summary must succeed here too, not only
           # inside the guarded self-test calls above.
-          printf '%s\n' "Test Files  8 passed (8)" > "${{ runner.temp }}/gate-direct.txt"
-          assert_summary "Test Files" "${{ runner.temp }}/gate-direct.txt" >/dev/null
+          printf '%s\n' "Test Files  8 passed (8)" > "$RUNNER_TEMP/gate-direct.txt"
+          assert_summary "Test Files" "$RUNNER_TEMP/gate-direct.txt" >/dev/null
           echo "gate self-test ok: direct call on valid summary"
           # Real check on the live run output.
-          assert_summary "Test Files" "${{ runner.temp }}/live-test-clean.txt"
-          assert_summary "Tests " "${{ runner.temp }}/live-test-clean.txt"
+          assert_summary "Test Files" "$RUNNER_TEMP/live-test-clean.txt"
+          assert_summary "Tests " "$RUNNER_TEMP/live-test-clean.txt"
           echo "all collected tests passed with no skips; live verification enforced"
