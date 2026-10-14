@@ -75,3 +75,75 @@ Planets come exclusively from the injected provider under the V1 configuration; 
 ### Tolerances and limitations
 
 Algorithm tolerances (new quantities, not a weakening of Phase 3B/3C): tropical geometry 1", sidereal conversion 2", planets per the astro.com anchor (0.018"). These are separate from birth time/coordinate uncertainty, which dominates real charts (1 s of time moves the Ascendant ~15"; town-centre uncertainty moves it tens of arcseconds). ΔT interpolation/clamping error is nil (~1.6e-6" per second) against tolerance. Out of scope: Vargas, dashas, yogas/doshas, interpretation, and UI.
+
+## ADR-005: Vimshottari Dasha Calculation Conventions
+
+**Status:** Accepted for Phase 3E implementation (founder-approved conventions; implementation not started).
+
+This ADR records the approved Vimshottari Mahadasha and Antardasha rules. It preserves ADR-003 (365.25-day dasha year, 120-year cycle, Moon longitude starts the balance, left-inclusive boundaries) and ADR-004 (birth instant converted to UTC as the anchor). No existing decision is altered; no conflict with prior documentation was found. Pratyantardasha and deeper subdivisions are out of scope.
+
+### A. Mahadasha sequence and durations
+
+The sequence repeats cyclically in this order:
+
+| Lord | Duration |
+|---|---:|
+| Ketu | 7 years |
+| Venus | 20 years |
+| Sun | 6 years |
+| Moon | 10 years |
+| Mars | 7 years |
+| Rahu | 18 years |
+| Jupiter | 16 years |
+| Saturn | 19 years |
+| Mercury | 17 years |
+| **Total** | **120 years** |
+
+Check: 7 + 20 + 6 + 10 + 7 + 18 + 16 + 19 + 17 = 120. The durations sum to exactly 120 years, consistent with the ADR-003 120-year cycle.
+
+### B. Nakshatra-to-lord mapping
+
+Ashwini starts with Ketu. The nine lords are assigned in the order above to consecutive nakshatras, repeating that sequence for all 27 nakshatras. Consequently, Magha (the 10th nakshatra) starts the sequence again with Ketu.
+
+The existing project boundaries apply: left-inclusive, right-exclusive. A Moon longitude exactly on a nakshatra boundary belongs to the nakshatra beginning at that boundary.
+
+### C. Birth Mahadasha balance
+
+Let:
+- `f` be the fraction of the birth nakshatra traversed by the Moon, calculated from its sidereal longitude and the existing 13°20′ nakshatra span;
+- `Y` be the full duration, in years, of the lord assigned to the birth nakshatra.
+
+Define:
+
+- Elapsed Mahadasha duration at birth = `f × Y`.
+- Remaining Mahadasha duration at birth = `(1 − f) × Y`.
+- Notional Mahadasha start = birth UTC instant minus the elapsed duration.
+- Mahadasha end = notional Mahadasha start plus the full duration `Y × 365.25 days`.
+
+The resulting Mahadasha end must equal the birth instant plus the remaining duration, subject only to the documented timestamp representation precision.
+
+Do not restart the birth Mahadasha at the birth instant: the partially elapsed birth Mahadasha keeps its notional start before birth, so its already-elapsed portion is preserved.
+
+### D. Antardasha rules
+
+Within each Mahadasha, Antardashas follow the same cyclic nine-lord order, beginning with the Mahadasha lord itself.
+
+For each Antardasha:
+
+`Antardasha duration = Mahadasha years × Antardasha lord years ÷ 120`
+
+Anchor the sequence to the **notional Mahadasha start**, not to the birth instant. Determine the Antardasha active at birth by locating the birth instant within the resulting intervals.
+
+For a partially elapsed Mahadasha, some Antardashas may already have started or ended before birth. Preserve that chronology.
+
+This ADR covers Mahadasha and Antardasha only; Pratyantardasha and deeper subdivisions are not added.
+
+### E. Time arithmetic and intervals
+
+- One Dasha year is exactly 365.25 days, as already approved in ADR-003.
+- Use the birth instant converted to UTC (per ADR-004) as the anchor.
+- All periods use start-inclusive, end-exclusive intervals: `[start, end)`.
+- Use integer-millisecond or finer instant representation.
+- Compute boundaries from their original canonical anchor at full available precision, rounding only when materializing each absolute boundary at the supported timestamp precision. Do not repeatedly add rounded durations and accumulate drift.
+- Ensure consecutive Mahadashas are contiguous and that all Antardashas within a Mahadasha end exactly at its Mahadasha boundary under the chosen precision policy.
+- Distinguish mathematical duration precision from the precision of serialized timestamps.

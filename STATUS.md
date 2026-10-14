@@ -1,10 +1,10 @@
 # Status
 
 ## Current task
-Phase 3D D1 birth-chart engine implementation.
+Phase 3E Vimshottari Dasha conventions (ADR-005 documentation only; implementation not started).
 
 ## State
-Phase 3D is complete. New `packages/astrology-core` engine (`ascendant.ts`, `ayanamsha.ts`, `nutation-iau2000b.ts`, `d1-chart.ts`) computes the tropical Ascendant by the frozen Step 1 recipe (IAU-1982 GMST, Lieske obliquity + IAU-2000B nutation, apparent RAMC), converts with the validated TRUE Lahiri ayanamsha, takes all nine grahas from the injected V1 provider (Ketu exactly Rahu + 180°), and derives sign/degree, nakshatra/pada (left-inclusive microarcsecond boundaries), whole-sign houses, and measured (+1 day) retrograde. Time convention frozen per ADR-004: civil + IANA zone to UTC, JD used directly as UT, no DUT1. Conventions unchanged; no Vargas/dashas/yogas/AI/deployment work done.
+Phase 3D is accepted at the D1 engine checkpoint `52f14c703fe3e64cc0747023213582f17c72d236`. Phase 3E conventions are approved and documented in ADR-005 (Mahadasha sequence and 120-year durations, Ashwini→Ketu nakshatra mapping, birth-balance with notional Mahadasha start, Antardashas anchored to the notional start, 365.25-day year, `[start, end)` intervals). Dasha implementation has **not started**: no Dasha calculation code, tests, or results exist. Conventions otherwise unchanged. The non-blocking Phase 3D follow-ups (ayanamsha consolidation, stationary-retrograde documentation) remain open for a later task.
 
 ## Commit
 
@@ -25,4 +25,4 @@ Phase 2 decision commit: `fdc7ac71fc9f866cda24fb07885d878ffc697d5f`.
 No production credentials, database, AI provider, or deployments are configured. The provider binary and ephemeris data are build-machine artifacts, not yet part of any deployment story; AGPL Corresponding Source and network-source availability remain open. D1 algorithm tolerance (arcseconds) is separate from birth time/coordinate uncertainty (arcminutes); pole latitudes rejected; host TZDB version unknowable via ECMAScript.
 
 ## Next single action
-Founder review of Phase 3D, then explicit approval before Vargas or dasha work begins.
+Founder review of ADR-005, followed by a separately approved Phase 3E implementation task. Do not begin Dasha implementation in this task.
